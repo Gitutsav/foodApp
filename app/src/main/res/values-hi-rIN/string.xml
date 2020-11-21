@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OneBanc</string>
+    <string name="prvious_order">पिछला आदेश</string>
+    <string name="top_dishes">शीर्ष व्यंजन</string>
+    <string name="order_id">आदेश ID : #</string>
+    <string name="view_order">आदेश देखें</string>
+    <string name="home"></string>
+
+</resources>
