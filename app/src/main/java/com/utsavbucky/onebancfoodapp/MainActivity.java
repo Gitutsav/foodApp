@@ -88,11 +88,10 @@ public class MainActivity extends BaseActivity {
         setPreviousOrders();
 
         final Handler handler = new Handler();
-        final int delay = 1000; // 1000 milliseconds == 1 second
+        final int delay = 30000;
 
         handler.postDelayed(new Runnable() {
             public void run() {
-                //System.out.println("myHandler: here!"); // Do your work here
                 updateDishPrice();
                 handler.postDelayed(this, delay);
             }

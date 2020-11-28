@@ -22,6 +22,7 @@ import com.utsavbucky.onebancfoodapp.fragments.OrderDishesListDialog;
 import com.utsavbucky.onebancfoodapp.models.Dishes;
 import com.utsavbucky.onebancfoodapp.models.Orders;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class PreviousOrdersAdapter extends RecyclerView.Adapter<PreviousOrdersAdapter.MyViewHolder> {
@@ -59,7 +60,8 @@ public class PreviousOrdersAdapter extends RecyclerView.Adapter<PreviousOrdersAd
         Orders order = ordersList.get(position);
 
         holder.date.setText(order.orderDate);
-        holder.itemTotal.setText("Rs."+String.valueOf(order.orderPrice));
+        double itemCost =  Double.parseDouble(new DecimalFormat("##.##").format(order.orderPrice));
+        holder.itemTotal.setText("Rs."+String.valueOf(itemCost));
         //holder.orderId.setText("Order id: #"+order.orderId);
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override

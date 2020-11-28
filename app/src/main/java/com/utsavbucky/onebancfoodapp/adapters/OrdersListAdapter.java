@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.utsavbucky.onebancfoodapp.R;
 import com.utsavbucky.onebancfoodapp.models.Dishes;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class OrdersListAdapter extends RecyclerView.Adapter<OrdersListAdapter.MyViewHolder> {
@@ -50,6 +51,7 @@ public class OrdersListAdapter extends RecyclerView.Adapter<OrdersListAdapter.My
         for (double x : dish.quantityQueue) {
             itemCost += x;
         }
+        itemCost = Double.parseDouble(new DecimalFormat("##.##").format(itemCost));
         String tot = "Rs."+itemCost;
         holder.itemTotal.setText(tot);
 
