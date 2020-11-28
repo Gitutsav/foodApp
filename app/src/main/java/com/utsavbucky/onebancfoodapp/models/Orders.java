@@ -7,10 +7,10 @@ public class Orders {
 
     public ArrayList<Dishes> orderDishesList ;
     public String orderId ;
-    public int orderPrice;
+    public double orderPrice;
     public String orderDate;
 
-    public Orders(ArrayList<Dishes> orderDishesList, String orderId, int orderPrice, String orderDate) {
+    public Orders(ArrayList<Dishes> orderDishesList, String orderId, double orderPrice, String orderDate) {
         this.orderDishesList = orderDishesList;
         this.orderId = orderId;
         this.orderPrice = orderPrice;

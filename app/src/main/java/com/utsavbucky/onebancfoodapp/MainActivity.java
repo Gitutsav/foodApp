@@ -5,7 +5,10 @@ import androidx.databinding.DataBindingUtil;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
+import androidx.viewpager.widget.ViewPager;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,10 +17,12 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.google.gson.Gson;
+import com.utsavbucky.onebancfoodapp.adapters.CategoryAdapter;
 import com.utsavbucky.onebancfoodapp.adapters.DishAdapter;
 import com.utsavbucky.onebancfoodapp.adapters.PreviousOrdersAdapter;
 import com.utsavbucky.onebancfoodapp.adapters.ViewPagerAdapter;
@@ -30,9 +35,12 @@ import com.utsavbucky.onebancfoodapp.utils.LocaleManager;
 import com.utsavbucky.onebancfoodapp.utils.Util;
 import com.utsavbucky.onebancfoodapp.utils.constants;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -70,39 +78,36 @@ public class MainActivity extends BaseActivity {
 
         topDishes = findViewById(R.id.top_dishes);
         previousOrders = findViewById(R.id.previous_orders);
-        if(Util.getCategoryList(MainActivity.this)== null ||
+        /*if(Util.getCategoryList(MainActivity.this)== null ||
                 Util.getDishesList(MainActivity.this) == null)
-        {
+        {*/
             prepareData();
-        }
+       // }
         setCategoriesList();
         setTopDishes();
         setPreviousOrders();
+
+        final Handler handler = new Handler();
+        final int delay = 1000; // 1000 milliseconds == 1 second
+
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                //System.out.println("myHandler: here!"); // Do your work here
+                updateDishPrice();
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
     }
 
     public void setCategoriesList(){
         categoryList = Util.getCategoryList(MainActivity.this);
-        binding.viewPager.setAdapter(new ViewPagerAdapter(this, categoryList));
-        final Handler handler = new Handler();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+        binding.categories.setLayoutManager(layoutManager);
+        binding.categories.setItemAnimator(new DefaultItemAnimator());
+        binding.categories.setAdapter(new CategoryAdapter(this, categoryList));
+        layoutManager.scrollToPosition(((Integer.MAX_VALUE/2)-((Integer.MAX_VALUE/2)%categoryList.size())));
 
-        final Runnable update = new Runnable() {
-            public void run() {
-                binding.viewPager.setCurrentItem(currentPage, true);
-                if (currentPage == 5) {
-                    currentPage = 0;
-                } else {
-                    ++currentPage;
-                }
-            }
-        };
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
 
-            @Override
-            public void run() {
-                handler.post(update);
-            }
-        }, 500, 2500);
     }
 
     public void prepareData(){
@@ -112,16 +117,17 @@ public class MainActivity extends BaseActivity {
         categoryList.add(new Category("https://d4t7t8y8xqo0t.cloudfront.net/resized/750X436/eazytrendz%2F2033%2Ftrend20180920125236.jpg",constants.SOUTH_INDIAN,"South Indian"));
         categoryList.add(new Category("https://restaurantindia.s3.ap-south-1.amazonaws.com/s3fs-public/content10735.jpg",constants.ITALIAN,"Italian"));
 
-        dishesList.add(new Dishes("https://cdn2.foodviva.com/static-content/food-images/snacks-recipes/khaman-dhokla-recipe/khaman-dhokla-recipe.jpg","Dhokla",1,constants.NORTH_INDIAN,100,0,0));
-        dishesList.add(new Dishes("https://sukhis.com/wp-content/uploads/2020/01/Dosa-500x400.jpg","Dosa",2, constants.SOUTH_INDIAN,80,0,0));
-        dishesList.add(new Dishes("https://farm1.staticflickr.com/269/19741628821_7ff0dd8b7c_o.jpg","Paneer pasanda",3, constants.NORTH_INDIAN, 200,0,0));
-        dishesList.add(new Dishes("https://farm1.staticflickr.com/269/19741628821_7ff0dd8b7c_o.jpg","Pizza",4, constants.ITALIAN, 350,0,0));
-        dishesList.add(new Dishes("https://simply-delicious-food.com/wp-content/uploads/2015/07/Bacon-and-cheese-burgers-3-500x500.jpg","Burger",5, constants.CHINESE,120,0,0));
-        dishesList.add(new Dishes("https://cdn2.foodviva.com/static-content/food-images/snacks-recipes/khaman-dhokla-recipe/khaman-dhokla-recipe.jpg","Spanakopita",6,constants.MEDITERRANEAN,100,0,0));
-        dishesList.add(new Dishes("https://sukhis.com/wp-content/uploads/2020/01/Dosa-500x400.jpg","Chicken Shawarma",7, constants.MEDITERRANEAN,80,0,0));
-        dishesList.add(new Dishes("https://farm1.staticflickr.com/269/19741628821_7ff0dd8b7c_o.jpg","Paneer kofta",8, constants.NORTH_INDIAN, 200,0,0));
-        dishesList.add(new Dishes("https://farm1.staticflickr.com/269/19741628821_7ff0dd8b7c_o.jpg","Garlic Bread",9, constants.ITALIAN, 350,0,0));
-        dishesList.add(new Dishes("https://simply-delicious-food.com/wp-content/uploads/2015/07/Bacon-and-cheese-burgers-3-500x500.jpg","Chowmein",0, constants.CHINESE,120,0,0));
+
+        dishesList.add(new Dishes("https://cdn2.foodviva.com/static-content/food-images/snacks-recipes/khaman-dhokla-recipe/khaman-dhokla-recipe.jpg","Dhokla",1,constants.NORTH_INDIAN,100.0,0,0, new PriorityQueue<Double>()));
+        dishesList.add(new Dishes("https://sukhis.com/wp-content/uploads/2020/01/Dosa-500x400.jpg","Dosa",2, constants.SOUTH_INDIAN,80.0,0,0,new PriorityQueue<Double>()));
+        dishesList.add(new Dishes("https://farm1.staticflickr.com/269/19741628821_7ff0dd8b7c_o.jpg","Paneer pasanda",3, constants.NORTH_INDIAN, 200.0,0,0,new PriorityQueue<Double>()));
+        dishesList.add(new Dishes("https://farm1.staticflickr.com/269/19741628821_7ff0dd8b7c_o.jpg","Pizza",4, constants.ITALIAN, 350.0,0,0, new PriorityQueue<Double>()));
+        dishesList.add(new Dishes("https://simply-delicious-food.com/wp-content/uploads/2015/07/Bacon-and-cheese-burgers-3-500x500.jpg","Burger",5, constants.CHINESE,120.0,0,0, new PriorityQueue<Double>()));
+        dishesList.add(new Dishes("https://cdn2.foodviva.com/static-content/food-images/snacks-recipes/khaman-dhokla-recipe/khaman-dhokla-recipe.jpg","Spanakopita",6,constants.MEDITERRANEAN,100.0,0,0, new PriorityQueue<Double>()));
+        dishesList.add(new Dishes("https://sukhis.com/wp-content/uploads/2020/01/Dosa-500x400.jpg","Chicken Shawarma",7, constants.MEDITERRANEAN,80.0,0,0 , new PriorityQueue<Double>()));
+        dishesList.add(new Dishes("https://farm1.staticflickr.com/269/19741628821_7ff0dd8b7c_o.jpg","Paneer kofta",8, constants.NORTH_INDIAN, 200.0,0,0, new PriorityQueue<Double>()));
+        dishesList.add(new Dishes("https://farm1.staticflickr.com/269/19741628821_7ff0dd8b7c_o.jpg","Garlic Bread",9, constants.ITALIAN, 350.0,0,0, new PriorityQueue<Double>()));
+        dishesList.add(new Dishes("https://simply-delicious-food.com/wp-content/uploads/2015/07/Bacon-and-cheese-burgers-3-500x500.jpg","Chowmein",0, constants.CHINESE,120.0,0,0, new PriorityQueue<Double>()));
 
         dishSharedPreferences=getSharedPreferences(constants.DISHES_LIST,0);
         categorySharedPreferences = getSharedPreferences(constants.CATEGORIES_LIST,0);
@@ -136,6 +142,18 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    public void updateDishPrice()
+    {
+        ArrayList<Dishes> toUpdateDishList = Util.getDishesList(MainActivity.this);
+        for(int i = 0;i<toUpdateDishList.size();i++){
+            double newPrice = toUpdateDishList.get(i).price + toUpdateDishList.get(i).price*0.01;
+            toUpdateDishList.get(i).price = Double.parseDouble(new DecimalFormat("##.##").format(newPrice));
+        }
+        dishSharedPreferences=getSharedPreferences(constants.DISHES_LIST,0);
+        SharedPreferences.Editor editorDishes = dishSharedPreferences.edit();
+        editorDishes.putString("dishesList",new Gson().toJson(toUpdateDishList));
+        editorDishes.apply();
+    }
     public void setTopDishes() {
         if(dishesList!=null && dishesList.size()>0) {
             dishesList.clear();}
@@ -147,13 +165,14 @@ public class MainActivity extends BaseActivity {
                 return d2.soldQuantity - d1.soldQuantity;
             }
         });
-        ArrayList<Dishes> top5Dishes = new ArrayList<>();
-
-        topDishesAdapter = new DishAdapter(MainActivity.this,dishesList.subList(0,5));
+        List<Dishes> top5Dishes = new ArrayList<>();
+        top5Dishes = dishesList.subList(0,5);
+        topDishesAdapter = new DishAdapter(MainActivity.this,top5Dishes);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         topDishes.setLayoutManager(layoutManager);
         topDishes.setItemAnimator(new DefaultItemAnimator());
         topDishes.setAdapter(topDishesAdapter);
+
     }
 
     public void setPreviousOrders() {

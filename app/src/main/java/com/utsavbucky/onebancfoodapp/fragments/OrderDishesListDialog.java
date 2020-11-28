@@ -73,8 +73,9 @@ public class OrderDishesListDialog extends DialogFragment {
         orderlist = selectedOrder.orderDishesList;
         for(int i=0;i<orderlist.size();i++)    {
             nos = nos + orderlist.get(i).quantity;
-            total = total + orderlist.get(i).quantity*orderlist.get(i).price;
-
+            for (double x : orderlist.get(i).quantityQueue) {
+                total += x;
+            }
         }
         orderAdapter = new OrdersListAdapter(orderlist);
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false);

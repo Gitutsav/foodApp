@@ -26,6 +26,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 
 public class checkout extends AppCompatActivity {
     RecyclerView orderRecyclerView;
@@ -36,7 +37,7 @@ public class checkout extends AppCompatActivity {
     SharedPreferences ordersSharedPreferences, dishSharedPreferences;
     RelativeLayout orderButton;
     TextView orderQuantity, orderPrice;
-    int nos, total;
+    int nos; double total;
     static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     static SecureRandom rnd = new SecureRandom();
     ArrayList<Orders> previousOrdersList = new ArrayList<>();
@@ -79,8 +80,10 @@ public class checkout extends AppCompatActivity {
 
                 for(int i=0;i<orderlist.size();i++)    {
                     nos = nos + orderlist.get(i).quantity;
-                    total = total + orderlist.get(i).quantity*orderlist.get(i).price;
 
+                    for (double x : orderlist.get(i).quantityQueue) {
+                        total += x;
+                    }
                     for(int j=0; j<disheslist.size();j++){
                         if(orderlist.get(i).dishId==disheslist.get(j).dishId){
                             disheslist.get(j).soldQuantity = disheslist.get(j).soldQuantity + orderlist.get(i).quantity;
@@ -104,8 +107,9 @@ public class checkout extends AppCompatActivity {
     private void setOrderList() {
          for(int i=0;i<orderlist.size();i++)    {
             nos = nos + orderlist.get(i).quantity;
-            total = total + orderlist.get(i).quantity*orderlist.get(i).price;
-
+             for (double x : orderlist.get(i).quantityQueue) {
+                 total += x;
+             }
         }
         orderAdapter = new OrdersAdapter(orderlist);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);

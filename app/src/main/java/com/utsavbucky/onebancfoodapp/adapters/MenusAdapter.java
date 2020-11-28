@@ -8,16 +8,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.utsavbucky.onebancfoodapp.R;
 import com.utsavbucky.onebancfoodapp.models.Dishes;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class MenusAdapter extends RecyclerView.Adapter<MenusAdapter.MyViewHolder> {
-    private List<Dishes> dishesList;
+    private ArrayList<Dishes> dishesList;
     int q = 0;
     Context mContext;
     class MyViewHolder extends RecyclerView.ViewHolder {
@@ -34,7 +35,7 @@ public class MenusAdapter extends RecyclerView.Adapter<MenusAdapter.MyViewHolder
             minus = view.findViewById(R.id.minus);
         }
     }
-    public MenusAdapter(Context context, List<Dishes> dishesList)
+    public MenusAdapter(Context context, ArrayList<Dishes> dishesList)
     {
         this.dishesList = dishesList;
         this.mContext = context;
@@ -58,15 +59,18 @@ public class MenusAdapter extends RecyclerView.Adapter<MenusAdapter.MyViewHolder
             e.printStackTrace();
         }
         q = dish.quantity;
+        dish.quantityQueue.clear();
         holder.plus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(dish.quantity==0) {
                     dish.quantity += 1;
+                    dish.quantityQueue.add(dish.price);
                     holder.quantity.setText(String.valueOf(dish.quantity));
                     holder.minus.setVisibility(View.VISIBLE);
                 } else if(dish.quantity>0) {
                     dish.quantity += 1;
+                    dish.quantityQueue.add(dish.price);
                     holder.quantity.setText(String.valueOf(dish.quantity));
                 }
             }
@@ -76,9 +80,11 @@ public class MenusAdapter extends RecyclerView.Adapter<MenusAdapter.MyViewHolder
             public void onClick(View v) {
                 if(dish.quantity>1) {
                     dish.quantity -= 1;
+                    dish.quantityQueue.poll();
                     holder.quantity.setText(String.valueOf(dish.quantity));
                 } else if(dish.quantity==1) {
                     dish.quantity -= 1;
+                    dish.quantityQueue.poll();
                     holder.quantity.setText(String.valueOf(dish.quantity));
                     holder.minus.setVisibility(View.GONE);
                 }

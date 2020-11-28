@@ -43,7 +43,6 @@ public class MenuActivity extends AppCompatActivity {
            }
         }
 
-
         checkoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

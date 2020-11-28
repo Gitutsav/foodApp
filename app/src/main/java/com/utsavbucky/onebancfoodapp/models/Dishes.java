@@ -1,15 +1,25 @@
 package com.utsavbucky.onebancfoodapp.models;
 
 import java.io.Serializable;
+import java.util.PriorityQueue;
 
 public class Dishes implements Serializable {
     public String dishImg;
     public String dishName;
     public int dishId;
     public int dishCategory;
-    public int price;
+    public double price;
     public int quantity;
     public int soldQuantity;
+    public PriorityQueue<Double> quantityQueue = new PriorityQueue<>();
+
+    public PriorityQueue<Double> getQuantityQueue() {
+        return quantityQueue;
+    }
+
+    public void setQuantityQueue(PriorityQueue<Double> quantityQueue) {
+        this.quantityQueue = quantityQueue;
+    }
 
     public String getDishImg() {
         return dishImg;
@@ -43,11 +53,11 @@ public class Dishes implements Serializable {
         this.dishCategory = dishCategory;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
@@ -67,7 +77,8 @@ public class Dishes implements Serializable {
         this.soldQuantity = soldQuantity;
     }
 
-    public Dishes(String dishImg, String dishName, int dishId, int dishCategory, int price, int quantity, int soldQuantity) {
+    public Dishes(String dishImg, String dishName, int dishId, int dishCategory,
+                  double price, int quantity, int soldQuantity, PriorityQueue<Double> quantityQueue) {
          this.dishImg = dishImg;
          this.dishName = dishName;
          this.dishId = dishId;
@@ -75,5 +86,6 @@ public class Dishes implements Serializable {
          this.price = price;
          this.quantity = quantity;
          this.soldQuantity = soldQuantity;
+         this.quantityQueue = quantityQueue;
      }
  }

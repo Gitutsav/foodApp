@@ -45,9 +45,11 @@ public class OrdersListAdapter extends RecyclerView.Adapter<OrdersListAdapter.My
         Dishes dish = dishesList.get(position);
         holder.dishName.setText(dish.dishName);
         holder.price.setText("Rs."+String.valueOf(dish.price));
-        int itemCost = 0;
+        double itemCost = 0;
         holder.quantity.setText(dish.quantity+"");
-        itemCost = dish.quantity  * dish.price;
+        for (double x : dish.quantityQueue) {
+            itemCost += x;
+        }
         String tot = "Rs."+itemCost;
         holder.itemTotal.setText(tot);
 
