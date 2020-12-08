@@ -1,5 +1,7 @@
 package com.utsavbucky.onebancfoodapp;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -104,7 +106,27 @@ public class MainActivity extends BaseActivity {
         binding.categories.setLayoutManager(layoutManager);
         binding.categories.setItemAnimator(new DefaultItemAnimator());
         binding.categories.setAdapter(new CategoryAdapter(this, categoryList));
-        layoutManager.scrollToPosition(((Integer.MAX_VALUE/2)-((Integer.MAX_VALUE/2)%categoryList.size())));
+
+        binding.categories.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int firstItemPosition = layoutManager.findFirstVisibleItemPosition();
+                Log.d("first item position",firstItemPosition+"  position");
+                if (firstItemPosition != 1 && firstItemPosition % categoryList.size() == 1) {
+                    layoutManager.scrollToPosition(1);
+                } else if (firstItemPosition == 0) {
+                    layoutManager.scrollToPositionWithOffset(categoryList.size(), -recyclerView.computeHorizontalScrollOffset());
+                }
+            }
+        });
+
+        //layoutManager.scrollToPosition(((Integer.MAX_VALUE/2)-((Integer.MAX_VALUE/2)%categoryList.size())));
 
 
     }

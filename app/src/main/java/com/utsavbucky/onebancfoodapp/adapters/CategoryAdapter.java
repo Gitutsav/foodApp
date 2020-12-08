@@ -2,6 +2,7 @@ package com.utsavbucky.onebancfoodapp.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +54,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyView
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
+        Log.d("position",position+"  position");
         int positionInList = position % categoryList.size();
 
         Category category = categoryList.get(positionInList);
@@ -76,6 +78,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyView
 
     @Override
     public int getItemCount() {
-        return Integer.MAX_VALUE;
+        Log.d("test",categoryList.size()+"  size");
+        return categoryList == null ? 0 : categoryList.size() * 2 + 1;
     }
 }
